@@ -1,11 +1,8 @@
 ﻿app.views.CameraView = Backbone.View.extend({
     initialize: function () {
         this.template = app.templateLoader.get('cameraView');
-
-        if (navigator.camera) {
-            this.pictureSource = navigator.camera.PictureSourceType;
-            this.destinationType = navigator.camera.DestinationType;
-        }
+        this.pictureSource = navigator.camera.PictureSourceType;
+        this.destinationType = navigator.camera.DestinationType;
     },
 
     events: {
@@ -18,12 +15,11 @@
     },
 
     onCapture: function () {
-        if (navigator.camera) {
-            navigator.camera.getPicture(onSuccess, onFail, {
-                quality: 100,
-                destinationType: Camera.DestinationType.FILE_URI
-            });
-        }
+        console.log("OnCapture Called");
+        navigator.camera.getPicture(onSuccess, onFail, {
+            quality: 100,
+            destinationType: Camera.DestinationType.FILE_URI
+        });
     },
 
     analyzeImage: function(imageURI) {
