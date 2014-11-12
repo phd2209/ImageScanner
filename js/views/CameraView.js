@@ -1,8 +1,11 @@
 ﻿app.views.CameraView = Backbone.View.extend({
     initialize: function () {
         this.template = app.templateLoader.get('cameraView');
-        this.pictureSource = navigator.camera.PictureSourceType;
-        this.destinationType = navigator.camera.DestinationType;
+        if (navigator.camera) {
+            console.log("camera availeble");
+            this.pictureSource = navigator.camera.PictureSourceType;
+            this.destinationType = navigator.camera.DestinationType;
+        }
     },
 
     events: {
@@ -16,10 +19,13 @@
 
     onCapture: function () {
         console.log("OnCapture Called");
-        navigator.camera.getPicture(onSuccess, onFail, {
-            quality: 100,
-            destinationType: Camera.DestinationType.FILE_URI
-        });
+        var self = this;
+        if (navigator.camera) {
+            navigator.camera.getPicture(self.onSuccess, self.onFail, {
+                quality: 100,
+                destinationType: Camera.DestinationType.FILE_URI
+            });
+        }
     },
 
     analyzeImage: function(imageURI) {
@@ -29,16 +35,27 @@
     },
 
     onSuccess: function (imageURI) {
+        console.log("success");
         var image = document.getElementById('largeImage');
         image.style.display = 'block';
         image.src = imageURI;
-        this.analyzeImage(imageURI).done(function () {
-            app.router.navigate("results", { trigger: true });
-            //app.spinner.stop(self.spinner_div);
+        this.analyzeImage(imageURI).done(function () {            
+            if (navigator.camera) {
+                navigator.camera.cleanup(onSuccess, onFail);
+                function onSuccess() {
+                    console.log("Camera cleanup success.")
+                }
+
+                function onFail(message) {
+                    alert('Failed because: ' + message);
+                }
+                app.router.navigate("results", { trigger: true });
+            }
         });
     },
 
     onFail: function (message) {
+        console.log(message);
         alert("Failed because: " + message);
     }
 });
